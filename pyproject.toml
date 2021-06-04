@@ -5,7 +5,17 @@ description = ""
 authors = ["Jethro Kuan <jethrokuan95@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.7,<3.10"
+youtube_dl = "^2021.5.16"
+requests = "^2.25.1"
+beautifulsoup4 = "^4.9.3"
+numpy = "^1.20.3"
+pydub = "^0.25.1"
+matplotlib = "^3.4.2"
+SQLAlchemy = "^1.4.17"
+scipy = "^1.6.3"
+Flask = "^2.0.1"
+Flask-Cors = "^3.0.10"
 
 [tool.poetry.dev-dependencies]
 black = "^21.5b2"
