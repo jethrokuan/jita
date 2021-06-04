@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "jita"
+version = "0.1.0"
+description = ""
+authors = ["Jethro Kuan <jethrokuan95@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+black = "^21.5b2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+app = "jita.app:main"
