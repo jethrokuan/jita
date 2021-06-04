@@ -10,27 +10,14 @@ from pydub.utils import audioop
 
 from jita.fingerprinter import wavio
 
+import hashlib
 
-def unique_hash(file_path: str, block_size: int = 2**20) -> str:
-    """ Small function to generate a hash to uniquely generate
-    a file. Inspired by MD5 version here:
-    http://stackoverflow.com/a/1131255/712997
-
-    Works with large files.
-
-    :param file_path: path to file.
-    :param block_size: read block size.
-    :return: a hash in an hexagesimal string form.
-    """
-    s = sha1()
-    with open(file_path, "rb") as f:
-        while True:
-            buf = f.read(block_size)
-            if not buf:
-                break
-            s.update(buf)
-    return s.hexdigest().upper()
-
+def checksum(filename, hash_factory=hashlib.md5, chunk_num_blocks=1024):
+    h = hash_factory()
+    with open(filename,'rb') as f:
+        while chunk := f.read(chunk_num_blocks * h.block_size):
+            h.update(chunk)
+    return h.hexdigest()
 
 def find_files(path: str, extensions: List[str]) -> List[Tuple[str, str]]:
     """
@@ -52,7 +39,7 @@ def find_files(path: str, extensions: List[str]) -> List[Tuple[str, str]]:
     return results
 
 
-def read(file_name: str, limit: int = None) -> Tuple[List[List[int]], int, str]:
+def read(file_name: str) -> Tuple[List[List[int]], int, str]:
     """
     Reads any file supported by pydub (ffmpeg) and returns the data contained
     within. If file reading fails due to input being a 24-bit wav file,
@@ -63,15 +50,11 @@ def read(file_name: str, limit: int = None) -> Tuple[List[List[int]], int, str]:
     seconds from the start of the file.
 
     :param file_name: file to be read.
-    :param limit: number of seconds to limit.
     :return: tuple list of (channels, sample_rate, content_file_hash).
     """
     # pydub does not support 24-bit wav files, use wavio when this occurs
     try:
         audiofile = AudioSegment.from_file(file_name)
-
-        if limit:
-            audiofile = audiofile[:limit * 1000]
 
         data = np.fromstring(audiofile.raw_data, np.int16)
 
@@ -83,9 +66,6 @@ def read(file_name: str, limit: int = None) -> Tuple[List[List[int]], int, str]:
     except audioop.error:
         _, _, audiofile = wavio.readwav(file_name)
 
-        if limit:
-            audiofile = audiofile[:limit * 1000]
-
         audiofile = audiofile.T
         audiofile = audiofile.astype(np.int16)
 
@@ -93,7 +73,7 @@ def read(file_name: str, limit: int = None) -> Tuple[List[List[int]], int, str]:
         for chn in audiofile:
             channels.append(chn)
 
-    return channels, audiofile.frame_rate, unique_hash(file_name)
+    return channels, audiofile.frame_rate, checksum(file_name)
 
 
 def get_audio_name_from_path(file_path: str) -> str:

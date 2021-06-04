@@ -18,7 +18,7 @@ DEFAULT_WINDOW_SIZE = 4096
 # Ratio by which each sequential window overlaps the last and the
 # next window. Higher overlap will allow a higher granularity of offset
 # matching, but potentially more fingerprints.
-DEFAULT_OVERLAP_RATIO = 0.6
+DEFAULT_OVERLAP_RATIO = 0.5
 
 # Degree to which a fingerprint can be paired with its neighbors. Higher values will
 # cause more fingerprints, but potentially better accuracy.

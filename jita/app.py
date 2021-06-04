@@ -3,6 +3,7 @@ from jita.db import *
 from jita.fingerprinter.config import *
 from jita.fingerprinter.fingerprint import fingerprint_file
 from sqlalchemy import select
+import io
 
 from flask import render_template, request
 from flask import Flask
@@ -14,11 +15,13 @@ CORS(app)
 
 @app.route('/read', methods=["POST"])
 def read_audio():
+    # TODO: prevent need to write to temporary file
     with open("temp.ogg", "wb") as f:
         f.write(request.data)
     hashes , _ = fingerprint_file("temp.ogg")
     matches, dedup_hashes = find_matches(list(hashes))
     result = align_matches(matches, dedup_hashes, len(hashes))
+    print(result)
     return result
 
 def find_matches(hashes):

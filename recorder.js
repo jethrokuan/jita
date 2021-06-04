@@ -39,6 +39,7 @@ function onRecordingReady(e) {
     var title = document.getElementById('title');
     var tab = document.getElementById('tab');
     var debug = document.getElementById('debug');
+    var confidence = document.getElementById('confidence');
     // e.data contains a blob representing the recording
     // let blob = new Blob(e.data, {type:'audio/mpeg-3'});
     console.log(e.data);
@@ -52,6 +53,7 @@ function onRecordingReady(e) {
         artist.innerHTML = result["artist"];
         title.innerHTML = result["title"];
         tab.innerHTML = result["tab"];
+        confidence.innerHTML = result["input_confidence"];
         debug.innerHTML = JSON.stringify(result);
     });
 

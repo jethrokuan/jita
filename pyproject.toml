@@ -16,6 +16,7 @@ SQLAlchemy = "^1.4.17"
 scipy = "^1.6.3"
 Flask = "^2.0.1"
 Flask-Cors = "^3.0.10"
+tqdm = "^4.61.0"
 
 [tool.poetry.dev-dependencies]
 black = "^21.5b2"

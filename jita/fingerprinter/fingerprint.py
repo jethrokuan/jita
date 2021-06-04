@@ -157,14 +157,11 @@ def generate_hashes(peaks: List[Tuple[int, int]], fan_value: int = DEFAULT_FAN_V
     return hashes
 
 def fingerprint_file(filename: str) -> Dict[str, any]:
-    channels, Fs, file_hash = decoder.read(filename, 100)
-
+    channels, Fs, file_hash = decoder.read(filename)
     fingerprints = set()
     channel_amount = len(channels)
     for channeln, channel in enumerate(channels, start=1):
-        print(f"Fingerprinting channel {channeln}/{channel_amount} for {filename}")
         hashes = fingerprint(channel, Fs=Fs)
-        print(f"Finished channel {channeln}/{channel_amount} for {filename}")
         fingerprints |= set(hashes)
 
     return fingerprints, file_hash
