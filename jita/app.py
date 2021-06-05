@@ -1,7 +1,8 @@
 from itertools import groupby
 from jita.db import *
 from jita.fingerprinter.config import *
-from jita.fingerprinter.fingerprint import fingerprint_file
+from pydub import AudioSegment
+from jita.fingerprinter.fingerprint import fingerprint_segment
 from sqlalchemy import select
 import io
 
@@ -18,7 +19,9 @@ def read_audio():
     # TODO: prevent need to write to temporary file
     with open("temp.ogg", "wb") as f:
         f.write(request.data)
-    hashes , _ = fingerprint_file("temp.ogg")
+    mp3 = AudioSegment.from_file("temp.ogg").export("temp.mp3", format="mp3")
+    mp3 = AudioSegment.from_file("temp.mp3")
+    hashes = fingerprint_segment(mp3)
     matches, dedup_hashes = find_matches(list(hashes))
     result = align_matches(matches, dedup_hashes, len(hashes))
     print(result)
@@ -49,8 +52,7 @@ def find_matches(hashes):
                     results.append((sid, offset - song_sampled_offset))
     return results, dedup_hashes
 
-def align_matches(matches, dedup_hashes, queried_hashes: int,
-                  topn: int = 2):
+def align_matches(matches, dedup_hashes, queried_hashes: int):
         """
         Finds hash matches that align in time with other matches and finds
         consensus about which hashes are "true" signal from the audio.

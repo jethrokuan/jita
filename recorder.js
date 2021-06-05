@@ -23,7 +23,8 @@ window.onload = function () {
     // an audio blob available
     recorder.addEventListener('dataavailable', onRecordingReady);
 
-    setInterval('recordSnippet()', 8000);
+    recordSnippet();
+    setInterval('recordSnippet()', 5000);
   });
 };
 
@@ -31,7 +32,7 @@ function recordSnippet() {
     recorder.start();
     setTimeout(() => {
         recorder.stop();
-    }, 7000);
+    }, 4500);
 }
 function onRecordingReady(e) {
     var audio = document.getElementById('audio');
@@ -41,8 +42,6 @@ function onRecordingReady(e) {
     var debug = document.getElementById('debug');
     var confidence = document.getElementById('confidence');
     // e.data contains a blob representing the recording
-    // let blob = new Blob(e.data, {type:'audio/mpeg-3'});
-    console.log(e.data);
     audio.src = URL.createObjectURL(e.data);
     fetch("http://127.0.0.1:5000/read", {
         method: "POST",

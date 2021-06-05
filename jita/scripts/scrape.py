@@ -6,8 +6,11 @@ from argparse import ArgumentParser
 from jita.scrapers.youtube import search as youtube_search
 from jita.scrapers.youtube import download as youtube_download
 from jita.scrapers.ug import get_tab_url_from_search, get_tab
-from jita.fingerprinter.fingerprint import fingerprint_file
+from jita.fingerprinter.fingerprint import fingerprint_segment
+from jita.fingerprinter.decoder import checksum
 from jita.db import *
+
+from pydub import AudioSegment
 
 parser = ArgumentParser("Scrape YT and UG for items.")
 parser.add_argument("file", help="Input CSV file.")
@@ -16,24 +19,26 @@ args = parser.parse_args()
 
 def add_song(row):
     artist, title = row
-    song_path = f'songs/{artist}-{title}.opus'
+    song_path = f'songs/{artist}-{title}.mp3'
     if not os.path.exists(song_path):
         options = {
         'format': 'bestaudio/best',
             'outtmpl': f'songs/{artist}-{title}.%(ext)s',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'opus',
+                'preferredcodec': 'mp3',
             }],
             'noplaylist':'True'}
         video_url = youtube_search(f"{artist} - {title}")
         youtube_download(video_url, options=options)
 
-    fingerprints, song_id = fingerprint_file(song_path)
+    song_id = checksum(song_path)
+    segment = AudioSegment.from_file(song_path)
+    fingerprints = fingerprint_segment(segment)
     with engine.begin() as connection:
         r = connection.execute(songs_table.select().where(songs_table.c.id == song_id)).all()
 
-    if r is not None:
+    if len(r) != 0:
         return
 
     tab_url = get_tab_url_from_search(f"{artist} {title}")
